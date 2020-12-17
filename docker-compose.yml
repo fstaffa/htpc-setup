@@ -1,0 +1,145 @@
+version: '3.2'
+services:
+  jackett:
+    container_name: jackett
+    image: linuxserver/jackett:100
+    restart: unless-stopped
+    expose:
+      - "9117"
+    environment:
+      - PUID=1026 # default user id, for downloaded files access rights
+      - PGID=101 # default group id, for downloaded files access rights
+      - TZ=Europe/Paris # timezone
+    ports:
+      - 9117:9117
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/downloads/torrents:/downloads # place where to put .torrent files
+      - /volume1/docker/jackett/config:/config # config files
+  nginx:
+    container_name: nginx
+    ports:
+      - 8080:80
+    image: nginx:1.15.1
+    volumes:
+      - /volume1/docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - jackett
+      - sonarr
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:161
+    restart: unless-stopped
+    ports:
+      - 8989:8989
+    environment:
+      - PUID=1026 # default user id, for downloaded files access rights
+      - PGID=101 # default group id, for downloaded files access rights
+      - TZ=Europe/Paris # timezone
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/sonarr/config:/config # config files
+      - /volume1/shared/series:/tv # tv shows folder
+      - /volume1/downloads:/downloads # deluge download folder
+
+  nzbget:
+    container_name: nzbget
+    image: linuxserver/nzbget:147
+    restart: unless-stopped
+    ports:
+      - 6789:6789
+    environment:
+      - PUID=1026 # default user id, for downloaded files access rights
+      - PGID=101 # default group id, for downloaded files access rights
+      - TZ=Europe/Paris # timezone
+    volumes:
+      - /volume1/downloads:/downloads # download folder
+      - /volume1/docker/nzbget/config:/config # config files
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:137
+    restart: unless-stopped
+    ports:
+      - 7878:7878
+    environment:
+      - PUID=1026 # default user id, for downloaded files access rights
+      - PGID=101 # default group id, for downloaded files access rights
+      - TZ=Europe/Paris # timezone
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/radarr/config:/config # config files
+      - /volume1/shared/movies:/movies # movies folder
+      - /volume1/downloads:/downloads # deluge download folder
+
+  lidarr:
+    container_name: lidarr
+    image: linuxserver/lidarr:181
+    restart: unless-stopped
+    ports:
+      - 8686:8686
+    environment:
+      - PUID=1026 # default user id, for downloaded files access rights
+      - PGID=101 # default group id, for downloaded files access rights
+      - TZ=Europe/Paris # timezone
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/lidarr/config:/config # config files
+      - /volume1/shared/music:/music # movies folder
+      - /volume1/downloads:/downloads # deluge download folder
+
+  bazarr:
+    container_name: bazarr
+    image: linuxserver/bazarr:v0.6.6.3-ls9
+    restart: unless-stopped
+    ports:
+      - 6767:6767
+    environment:
+      - PUID=1026 # default user id, for downloaded files access rights
+      - PGID=101 # default group id, for downloaded files access rights
+      - TZ=Europe/Paris # timezone
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/bazarr/config:/config # config files
+      - /volume1/shared/movies:/movies # movies folder
+      - /volume1/shared/series:/tv # tv shows folder
+
+  muximux:
+    container_name: muximux
+    image: linuxserver/muximux:141
+    restart: unless-stopped
+    ports:
+      - 9000:80
+    environment:
+      - PUID=1026 # default user id, for downloaded files access rights
+      - PGID=101 # default group id, for downloaded files access rights
+      - TZ=Europe/Paris # timezone
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/muximux/config:/config # config files
+
+  deluge:
+    container_name: deluge
+    image: binhex/arch-delugevpn:1.3.15_14_gb8e5ebe82-1-16
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8112:8112
+      - 8118:8118
+    environment:
+      - PUID=1026 # default user id, for downloaded files access rights
+      - PGID=101 # default group id, for downloaded files access rights
+      - TZ=Europe/Paris # timezone
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/docker/deluge/config:/config # config files
+      - /volume1/downloads:/data # download folder
+    environment:
+      - VPN_ENABLED=yes
+      - VPN_PROV=airvpn
+      - ENABLE_PRIVOXY=yes
+      - DEBUG=false
+      - NAME_SERVERS=209.222.18.222,37.235.1.174,1.1.1.1,8.8.8.8,209.222.18.218,37.235.1.177,1.0.0.1,8.8.4.4
+      - LAN_NETWORK=192.168.1.0/24
