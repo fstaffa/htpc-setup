@@ -2,7 +2,7 @@ version: '3.2'
 services:
   jackett:
     container_name: jackett
-    image: linuxserver/jackett:100
+    image: linuxserver/jackett:version-v0.17.145
     restart: unless-stopped
     expose:
       - "9117"
@@ -29,7 +29,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:161
+    image: linuxserver/sonarr:preview-version-3.0.4.1033
     restart: unless-stopped
     ports:
       - 8989:8989
@@ -45,7 +45,7 @@ services:
 
   nzbget:
     container_name: nzbget
-    image: linuxserver/nzbget:147
+    image: linuxserver/nzbget:version-v21.0
     restart: unless-stopped
     ports:
       - 6789:6789
@@ -59,7 +59,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr:137
+    image: linuxserver/radarr:version-3.0.1.4259
     restart: unless-stopped
     ports:
       - 7878:7878
@@ -75,7 +75,7 @@ services:
 
   lidarr:
     container_name: lidarr
-    image: linuxserver/lidarr:181
+    image: linuxserver/lidarr:version-0.7.2.1878
     restart: unless-stopped
     ports:
       - 8686:8686
@@ -107,7 +107,7 @@ services:
 
   muximux:
     container_name: muximux
-    image: linuxserver/muximux:141
+    image: linuxserver/muximux:version-a2b403f5
     restart: unless-stopped
     ports:
       - 9000:80
@@ -121,7 +121,7 @@ services:
 
   deluge:
     container_name: deluge
-    image: binhex/arch-delugevpn:1.3.15_14_gb8e5ebe82-1-16
+    image: binhex/arch-delugevpn:2.0.4.dev38_g23a48dd01-3-01
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
@@ -138,8 +138,9 @@ services:
       - /volume1/downloads:/data # download folder
     environment:
       - VPN_ENABLED=yes
-      - VPN_PROV=airvpn
+      - VPN_CLIENT=openvpn
+      - VPN_PROV=purevpn
       - ENABLE_PRIVOXY=yes
       - DEBUG=false
       - NAME_SERVERS=209.222.18.222,37.235.1.174,1.1.1.1,8.8.8.8,209.222.18.218,37.235.1.177,1.0.0.1,8.8.4.4
-      - LAN_NETWORK=192.168.1.0/24
+      - LAN_NETWORK=192.168.50.0/24
